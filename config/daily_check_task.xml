@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-16"?>
+<!--
+  Windows Task Scheduler definition for the daily Weather Channel structure check.
+
+  Install from an elevated Command Prompt:
+      schtasks /Create /TN "Weather Channel Structure Watchdog" /XML "%~dp0daily_check_task.xml" /F
+
+  Adjust <Command> and <WorkingDirectory> to match your install path.
+  Replace USERNAME in <UserId> with the account that should run the task.
+-->
+<Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <Description>Verifies that weather.com's page structure still matches config/selectors.json. Writes a CRITICAL_CHANGE_DETECTED report with the new HTML when it does not.</Description>
+    <URI>\Weather Channel Structure Watchdog</URI>
+  </RegistrationInfo>
+  <Triggers>
+    <CalendarTrigger>
+      <StartBoundary>2026-01-01T06:00:00</StartBoundary>
+      <Enabled>true</Enabled>
+      <ScheduleByDay>
+        <DaysInterval>1</DaysInterval>
+      </ScheduleByDay>
+    </CalendarTrigger>
+  </Triggers>
+  <Principals>
+    <Principal id="Author">
+      <UserId>USERNAME</UserId>
+      <LogonType>InteractiveToken</LogonType>
+      <RunLevel>LeastPrivilege</RunLevel>
+    </Principal>
+  </Principals>
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <StartWhenAvailable>true</StartWhenAvailable>
+    <Enabled>true</Enabled>
+    <ExecutionTimeLimit>PT15M</ExecutionTimeLimit>
+  </Settings>
+  <Actions Context="Author">
+    <Exec>
+      <Command>python</Command>
+      <Arguments>tools\daily_structure_check.py --location USNY0996</Arguments>
+      <WorkingDirectory>C:\weather-channel-desktop</WorkingDirectory>
+    </Exec>
+  </Actions>
+</Task>

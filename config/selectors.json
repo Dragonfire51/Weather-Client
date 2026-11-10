@@ -1,0 +1,63 @@
+{
+  "$comment": "Selector registry for weather.com. 'critical' selectors break the app when missing; 'optional' ones only raise a WARNING. Update this file when a CRITICAL_CHANGE_DETECTED report tells you a selector moved.",
+  "version": 2,
+  "updated": "2026-11-10",
+  "pages": {
+    "today": {
+      "url_template": "https://weather.com/weather/today/l/{location_id}",
+      "strict": true,
+      "critical": [
+        { "name": "header-main", "selector": "[data-testid='header-main']", "role": "page header / branding" },
+        { "name": "location-picker-trigger", "selector": "[data-testid='location-picker-trigger']", "role": "location manager entry point" },
+        { "name": "sidebar-navigation", "selector": "[data-testid='sidebar-navigation']", "role": "section navigation menu" },
+        { "name": "subnavigation", "selector": "[data-testid='subnavigation']", "role": "forecast tab bar (hourly / daily)" },
+        { "name": "current-conditions", "selector": "[data-testid='current-conditions']", "role": "current conditions panel" },
+        { "name": "current-conditions-temperatures", "selector": "[data-testid='current-conditions-temperatures']", "role": "temperature readout" },
+        { "name": "current-widgets", "selector": "[data-testid='current-widgets']", "role": "details grid (humidity, wind, uv, pressure)" }
+      ],
+      "optional": [
+        { "name": "next-48-hours", "selector": "[data-testid='next-48-hours']", "role": "hourly strip" },
+        { "name": "daily-forecast", "selector": "[data-testid='daily-forecast']", "role": "extended daily forecast" },
+        { "name": "DynamicMap", "selector": "[data-testid='DynamicMap']", "role": "weather map container" },
+        { "name": "header-logo", "selector": "[data-testid='header-logo']", "role": "branding logo" }
+      ]
+    },
+    "hourbyhour": {
+      "url_template": "https://weather.com/weather/hourbyhour/l/{location_id}",
+      "strict": true,
+      "critical": [
+        { "name": "location-picker-trigger", "selector": "[data-testid='location-picker-trigger']", "role": "location manager entry point" },
+        { "name": "subnavigation", "selector": "[data-testid='subnavigation']", "role": "forecast tab bar" },
+        { "name": "sidebar-navigation", "selector": "[data-testid='sidebar-navigation']", "role": "section navigation menu" }
+      ],
+      "optional": [
+        { "name": "hourly-data-graph", "selector": "[data-testid='hourly-data-graph']", "role": "hourly forecast graph" }
+      ]
+    },
+    "tenday": {
+      "url_template": "https://weather.com/weather/tenday/l/{location_id}",
+      "strict": true,
+      "critical": [
+        { "name": "location-picker-trigger", "selector": "[data-testid='location-picker-trigger']", "role": "location manager entry point" },
+        { "name": "subnavigation", "selector": "[data-testid='subnavigation']", "role": "forecast tab bar" },
+        { "name": "sidebar-navigation", "selector": "[data-testid='sidebar-navigation']", "role": "section navigation menu" }
+      ],
+      "optional": [
+        { "name": "daily-forecast", "selector": "[data-testid='daily-forecast']", "role": "extended daily forecast" }
+      ]
+    }
+  },
+  "api": {
+    "key_fallback": "71f92ea9dd2f4790b92ea9dd2f779061",
+    "key_discovery_pages": [
+      "https://weather.com/weather/today/l/USNY0996"
+    ],
+    "base_url": "https://api.weather.com",
+    "endpoints": {
+      "location_search": "/v3/location/search",
+      "current_conditions": "/v3/wx/observations/current",
+      "hourly_forecast": "/v3/wx/forecast/hourly/2day",
+      "daily_forecast": "/v3/wx/forecast/daily/10day"
+    }
+  }
+}

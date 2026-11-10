@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>National and Local Weather Radar, Daily Forecast and Hurricane Information from The Weather Channel</title>
+</head>
+<body>
+  <div class="text-black max-md:bg-white" data-component="header-main" data-testid="header-main">
+    <span class="wx-skeleton">rendered client-side</span>
+  </div>
+  <button type="button" aria-expanded="false" aria-haspopup="dialog" aria-label="Search for a location" data-state="closed" data-testid="location-picker-trigger" class="cursor-pointer inline-flex h-10 items-center justify-center gap-2 rounded-3xl px-3 py-0 text-sm font-bold transition-colors md:h-12 md:px-4 focus-visible:ring-offset-0 focus-visible:outline-none bg-gray-900 text-white hover:bg-[#3A3938] active:bg-[#0C0B0B] focus-visible:ring-2 focus-visible:ring-blue-500">
+    <span class="wx-skeleton">rendered client-side</span>
+  </button>
+  <nav class="relative top-0 box-content flex h-screen w-20 flex-col gap-8 leading-none transition-colors duration-200 max-xl:items-center bg-white/0 xl:w-[200px]" data-component="sidebar-navigation" data-testid="sidebar-navigation" aria-label="Site Navigation Links">
+    <span class="wx-skeleton">rendered client-side</span>
+  </nav>
+  <div class="relative overflow-hidden rounded-3xl bg-white p-1 shadow-[0_4px_16px_0_rgba(0,0,0,0.08),_0_0_32px_0_rgba(0,0,0,0.12)] md:rounded-[28px] md:mr-auto md:max-w-[min(958px,100%)]" data-testid="subnavigation">
+    <span class="wx-skeleton">rendered client-side</span>
+  </div>
+  <section class="flex flex-col @container/card text-card-foreground border border-gray-200 bg-card relative isolate overflow-hidden rounded-2xl bg-clip-padding p-4 @lg/current-conditions:p-6" aria-label="Current Conditions" data-testid="current-conditions" style="background-color:var(--color-white)">
+    <span class="wx-skeleton">rendered client-side</span>
+  </section>
+  <div class="flex min-h-[21px] flex-wrap items-center gap-3 @lg/current-conditions:min-h-6" data-testid="current-conditions-temperatures">
+    <span class="wx-skeleton">rendered client-side</span>
+  </div>
+  <div data-testid="current-widgets" class="grid grid-cols-1 auto-rows-fr gap-3 @xs/currentWidget:grid-cols-2 @md/currentWidget:grid-cols-3">
+    <span class="wx-skeleton">rendered client-side</span>
+  </div>
+  <a href="/us/new-york/city/new-york-city/tenday" data-testid="next-48-hours" class="rounded-lg cursor-pointer bg-brand-400 text-primary-foreground hover:bg-[#252C3F] active:bg-[#0C1226] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 h-10 px-4 py-3 inline-flex items-center justify-center">
+    <span class="wx-skeleton">rendered client-side</span>
+  </a>
+  <section class="flex flex-col @container/card text-card-foreground bg-card border-gray-500 not-prose @container/daily order-0" aria-label="New York City Daily Forecast" data-testid="daily-forecast">
+    <span class="wx-skeleton">rendered client-side</span>
+  </section>
+  <section class="flex flex-col @container/card text-card-foreground bg-card border-gray-500 @container/dynamicMap" aria-label="Radar" data-testid="DynamicMap">
+    <span class="wx-skeleton">rendered client-side</span>
+  </section>
+  <a href="/" class="flex items-center md:hidden" data-testid="header-logo">
+    <span class="wx-skeleton">rendered client-side</span>
+  </a>
+</body>
+</html>

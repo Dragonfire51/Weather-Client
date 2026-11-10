@@ -1,0 +1,37 @@
+{
+  "$comment": "OpenHands automation: run the Weather Channel structure watchdog every 24 hours. On CRITICAL_CHANGE_DETECTED the agent reads the report written to logs/, proposes updated selectors for config/selectors.json, and (optionally) opens a PR.",
+  "name": "weather-channel-structure-watchdog",
+  "schedule": {
+    "type": "cron",
+    "expression": "0 6 * * *",
+    "timezone": "UTC",
+    "note": "Runs once every 24 hours, at 06:00 UTC."
+  },
+  "working_directory": ".",
+  "steps": [
+    {
+      "name": "run-watchdog",
+      "command": "python tools/daily_structure_check.py --location USNY0996 --json",
+      "on_exit_code": {
+        "0": "report-ok",
+        "1": "repair-selectors",
+        "2": "report-error"
+      }
+    },
+    {
+      "name": "report-ok",
+      "type": "noop",
+      "note": "Structure unchanged. logs/structure-check-history.jsonl records the run."
+    },
+    {
+      "name": "repair-selectors",
+      "type": "agent_prompt",
+      "prompt": "A CRITICAL_CHANGE_DETECTED report was just written under logs/. Read the newest logs/critical-change-*.log, which contains the broken selector names, the selector registry in effect, and a full HTML snapshot. Propose corrected CSS selectors for the broken entries only, keep the config/selectors.json schema, and open a pull request titled 'fix: update weather.com selectors' with the change and a short explanation."
+    },
+    {
+      "name": "report-error",
+      "type": "notify",
+      "note": "The watchdog could not reach weather.com (network outage, rate limiting, or config error). Retry next cycle; no selector change is implied."
+    }
+  ]
+}
