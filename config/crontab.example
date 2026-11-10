@@ -1,0 +1,11 @@
+# Weather Channel structure watchdog - runs once every 24 hours.
+#
+# Install (Linux/macOS):
+#   crontab -e
+#   then append the line below (adjust the path to this project).
+#
+# Log rotation is handled by the watchdog itself: at most 10 HTML snapshots
+# are kept under logs/snapshots/.
+
+# minute hour day month weekday   command
+0 6 * * *   cd /opt/weather-channel-desktop && /usr/bin/python3 tools/daily_structure_check.py --location USNY0996 >> logs/cron.log 2>&1
