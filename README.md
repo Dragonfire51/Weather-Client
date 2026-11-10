@@ -127,6 +127,9 @@ WEATHER_LIVE=1 pytest -m live            # contra weather.com real
   es lo que se ejecuta a diario.
 * `tests/test_gui_smoke.py` — la interfaz se construye, todas las vistas
   renderizan, el cambio de unidades funciona y el modal abre/cierra.
+* `tests/test_packaging.py` — resolución de rutas en modo código y en modo
+  congelado (`sys._MEIPASS` / `%APPDATA%`) y el sembrado del registro de
+  selectores editable.
 
 ## Regenerar los iconos
 
@@ -140,9 +143,49 @@ python tools/make_icons.py
 Para cambiar un dibujo, edita la función correspondiente en `SPRITES` dentro de
 `tools/make_icons.py` y vuelve a ejecutarlo.
 
-## Empaquetar como .exe
+## Empaquetar como .exe (Windows x64 y x86)
+
+El repositorio trae un *spec* de PyInstaller, el icono `.ico` multirresolución y
+el recurso de versión, así que el ejecutable se construye en un paso:
 
 ```bat
-pyinstaller --noconfirm --windowed --name "WeatherChannelDesktop" ^
-  --add-data "icons;icons" --add-data "config;config" weather_desktop.py
+pip install pyinstaller pillow
+python tools/make_icons.py
+python tools/make_icon_ico.py
+pyinstaller packaging\weather_desktop.spec --noconfirm --clean
 ```
+
+El resultado es `dist\WeatherChannelDesktop.exe`: un único archivo, sin consola.
+
+### Rutas cuando corre empaquetado
+
+`paths.py` centraliza el layout:
+
+| Contenido | Desde el código | Empaquetado |
+| --- | --- | --- |
+| Iconos y selectores (solo lectura) | carpeta del repo | `sys._MEIPASS` |
+| `user_settings.json`, `logs/`, snapshots HTML | carpeta del repo | `%APPDATA%\WeatherChannelDesktop` |
+
+Como el `.exe` de un archivo se descomprime en una carpeta temporal que se borra
+al salir, los logs y ajustes viven en el perfil del usuario. En el primer
+arranque se copia `config/selectors.json` a `%APPDATA%\WeatherChannelDesktop\config\`
+y esa copia tiene prioridad: si el vigilante detecta un cambio crítico, corriges
+el JSON **sin recompilar**.
+
+### Verificar el binario
+
+```bat
+dist\WeatherChannelDesktop.exe --selftest
+```
+
+Comprueba que los 14 iconos, el registro de selectores y el árbol de widgets se
+resuelven desde dentro del bundle. En CI se usa `--selftest --no-window`, que
+omite la ventana.
+
+### Automatización (GitHub Actions)
+
+`.github/workflows/build.yml` corre lint y pruebas, y luego compila la matriz
+**x64 + x86** en runners Windows (`setup-python` con `architecture: x86` produce
+el binario de 32 bits). El job de release adjunta ambos `.exe` y un
+`SHA256SUMS.txt` al release `latest` en cada push a `main`, y a un release
+versionado cuando se empuja un tag `v*`.

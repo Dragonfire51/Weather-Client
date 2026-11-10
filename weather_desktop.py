@@ -13,11 +13,12 @@ from __future__ import annotations
 import json
 import logging
 import queue
+import sys
 import threading
 import tkinter as tk
-from pathlib import Path
 from tkinter import messagebox
 
+import paths
 import weather_icons
 from weather_scraper import (
     STATUS_CRITICAL,
@@ -29,12 +30,12 @@ from weather_scraper import (
     WeatherError,
     format_speed,
     format_temp,
+    load_config,
 )
 
 LOGGER = logging.getLogger("weather_desktop")
 
-ROOT = Path(__file__).resolve().parent
-SETTINGS_PATH = ROOT / "config" / "user_settings.json"
+SETTINGS_PATH = paths.SETTINGS_PATH
 
 # --- Windows XP "Luna" palette -------------------------------------------- #
 BG_DESKTOP = "#D6E3F7"
@@ -72,7 +73,10 @@ class WeatherChannelDesktop:
 
     def __init__(self, root: tk.Tk, client: WeatherChannelClient | None = None):
         self.root = root
-        self.client = client or WeatherChannelClient()
+        if client is None:
+            paths.seed_user_config()
+            client = WeatherChannelClient(config_path=paths.resolve_config_path())
+        self.client = client
         self.settings = self._load_settings()
         self.unit = self.settings.get("unit", UNIT_CELSIUS)
         self.location: Location | None = Location.from_dict(self.settings["location"]) if self.settings.get("location") else None
@@ -634,7 +638,50 @@ class WeatherChannelDesktop:
         )
 
 
-def main() -> int:
+def selftest(*, window: bool = True) -> int:
+    """Headless packaging check: resources resolve and the widget tree builds.
+
+    Used by the build pipeline to prove a frozen executable is usable without
+    opening a window on a CI machine.
+    """
+    logging.basicConfig(level=logging.WARNING)
+    print(f"frozen        : {paths.is_frozen()}")
+    print(f"resource_dir  : {paths.RESOURCE_DIR}")
+    print(f"data_dir      : {paths.DATA_DIR}")
+    print(f"config        : {paths.resolve_config_path()}")
+    print(f"icon_dir      : {paths.ICON_DIR}")
+
+    missing = [c for c in weather_icons.ICON_CATEGORIES if not weather_icons.icon_path(c).exists()]
+    if missing:
+        print(f"FAIL missing icons: {', '.join(missing)}")
+        return 1
+    print(f"icons         : {len(weather_icons.ICON_CATEGORIES)} present")
+
+    config = load_config(paths.resolve_config_path())
+    print(f"pages         : {', '.join(sorted(config['pages']))}")
+
+    if window:
+        root = tk.Tk()
+        root.withdraw()
+        try:
+            app = WeatherChannelDesktop(root, client=WeatherChannelClient(config_path=paths.resolve_config_path()))
+            loaded = len(app.icons)
+            root.update_idletasks()
+            print(f"widgets       : {len(root.winfo_children())} top-level, {loaded} icons loaded")
+        finally:
+            root.destroy()
+    else:
+        print("widgets       : skipped (--no-window)")
+
+    print("SELFTEST OK")
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    argv = sys.argv[1:] if argv is None else argv
+    if "--selftest" in argv:
+        return selftest(window="--no-window" not in argv)
+
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
     root = tk.Tk()
     # The reference is kept alive for the lifetime of mainloop: Tkinter

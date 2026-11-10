@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-ICON_DIR = Path(__file__).resolve().parent / "icons"
+import paths
+
+ICON_DIR = paths.ICON_DIR
 
 # Every GIF the generator produces. Keep in sync with tools/make_icons.py.
 ICON_CATEGORIES: tuple[str, ...] = (
