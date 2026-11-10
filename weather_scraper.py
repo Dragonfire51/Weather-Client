@@ -30,11 +30,12 @@ from typing import Any
 import requests
 from bs4 import BeautifulSoup
 
+import paths
+
 LOGGER = logging.getLogger("weather_scraper")
 
-ROOT = Path(__file__).resolve().parent
-DEFAULT_CONFIG_PATH = ROOT / "config" / "selectors.json"
-DEFAULT_LOG_DIR = ROOT / "logs"
+DEFAULT_CONFIG_PATH = paths.DEFAULT_CONFIG_PATH
+DEFAULT_LOG_DIR = paths.DEFAULT_LOG_DIR
 
 STATUS_OK = "OK"
 STATUS_WARNING = "WARNING_SELECTOR_MISSING"

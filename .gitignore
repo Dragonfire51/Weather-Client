@@ -6,4 +6,7 @@ config/user_settings.json
 build/
 dist/
 *.spec
+!packaging/weather_desktop.spec
 .venv/
+.buildvenv/
+.ruff_cache/
